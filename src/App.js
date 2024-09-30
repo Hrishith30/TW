@@ -1,34 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { FaSearch } from 'react-icons/fa';
-import { WiDaySunny, WiNightClear, WiCloudy, WiRain, WiSnow, WiThunderstorm, WiFog } from 'react-icons/wi';
 import moment from 'moment-timezone';
 import countries from 'i18n-iso-countries';
 import enLocale from 'i18n-iso-countries/langs/en.json';
 import cityTimezones from 'city-timezones';
-import axios from 'axios';
+
 
 // Styled Components
 const AppContainer = styled.div`
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
 `;
 
 const SearchBarContainer = styled.div`
-  position: absolute;
+  position: fixed;
   top: 20px;
-  left: 20px;
   z-index: 1000;
-`;
-
-const ClockContainer = styled.div`
-  margin-left: 50px;
 `;
 
 const SearchInputWrapper = styled.div`
@@ -66,6 +59,10 @@ const SearchIcon = styled(FaSearch)`
   font-size: 18px;
 `;
 
+const ClockContainer = styled.div`
+  margin-top: 300px;
+`;
+
 const ClockWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -79,8 +76,7 @@ const ClockSVG = styled.svg`
 `;
 
 const ClockFace = styled.circle`
-  fill: #000000;
-  stroke: #333;
+  stroke: #000000;
   stroke-width: 8;
 `;
 
@@ -119,7 +115,7 @@ const CenterDot = styled.circle`
 
 const DecorativeRing = styled.circle`
   fill: none;
-  stroke: #ffffff;
+  stroke: #3498db;
   stroke-width: 3;
   opacity: 0.6;
 `;
@@ -174,76 +170,6 @@ const LocationMessage = styled.div`
   color: #333;
   margin-top: 10px;
   text-align: center;
-`;
-
-const CenterSearchBarContainer = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-`;
-
-const WeatherContainer = styled.div`
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  width: 300px;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  background-image: ${props => props.backgroundImage};
-  background-size: cover;
-  background-position: center;
-`;
-
-const WeatherInfo = styled.div`
-  font-size: 16px;
-  color: #fff;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-`;
-
-const WeatherLocation = styled.h3`
-  margin: 0 0 10px;
-  font-size: 24px;
-  color: #fff;
-`;
-
-const WeatherCondition = styled.p`
-  font-size: 20px;
-  font-weight: bold;
-  margin: 10px 0;
-  color: #fff;
-`;
-
-const WeatherIcon = styled.div`
-  font-size: 64px;
-  margin: 10px 0;
-  color: #fff;
-`;
-
-const WeatherDetail = styled.p`
-  margin: 5px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 5px 10px;
-  border-radius: 10px;
-`;
-
-const WeatherLabel = styled.span`
-  font-weight: bold;
-  color: #fff;
-`;
-
-const WeatherValue = styled.span`
-  color: #fff;
 `;
 
 // Helper Functions
@@ -311,11 +237,7 @@ const App = () => {
   const [selectedLocation, setSelectedLocation] = useState('Columbia, United States (CDT)');
   const [selectedTimezone, setSelectedTimezone] = useState('America/Chicago');
   const [timezoneData, setTimezoneData] = useState([]);
-  const [weatherLocation, setWeatherLocation] = useState('');
-  const [weatherData, setWeatherData] = useState(null);
-  const [weatherSuggestions, setWeatherSuggestions] = useState([]);
   const searchInputRef = useRef(null);
-  const weatherInputRef = useRef(null);
   
   useEffect(() => {
     countries.registerLocale(enLocale);
@@ -376,8 +298,8 @@ const App = () => {
     
     const uniqueSuggestions = Array.from(new Set(filteredSuggestions.map(JSON.stringify)))
       .map(JSON.parse)
-      .slice(0, 10);
-  
+      .slice(0, 20);
+
     setSuggestions(uniqueSuggestions);
   };
 
@@ -386,82 +308,6 @@ const App = () => {
     setSelectedTimezone(suggestion.timezone);
     setSearchTerm('');
     setSuggestions([]);
-  };
-
-  const fetchWeatherData = async (location) => {
-    try {
-      const API_KEY = '1749d7acb6d84f249d1221730242909';
-      const response = await axios.get(`https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${location}`);
-      setWeatherData(response.data);
-    } catch (error) {
-      console.error('Error fetching weather data:', error);
-      setWeatherData(null);
-    }
-  };
-
-  const fetchWeatherSuggestions = async (query) => {
-    if (query.length < 3) {
-      setWeatherSuggestions([]);
-      return;
-    }
-    try {
-      const API_KEY = '1749d7acb6d84f249d1221730242909';
-      const response = await axios.get(`https://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${query}`);
-      setWeatherSuggestions(response.data.slice(0, 10)); // Limit to 10 suggestions
-    } catch (error) {
-      console.error('Error fetching weather suggestions:', error);
-      setWeatherSuggestions([]);
-    }
-  };
-
-  const handleWeatherSearch = (event) => {
-    const value = event.target.value;
-    setWeatherLocation(value);
-    fetchWeatherSuggestions(value);
-  };
-
-  const handleWeatherSuggestionClick = (suggestion) => {
-    setWeatherLocation(suggestion.name);
-    setWeatherSuggestions([]);
-    fetchWeatherData(suggestion.name);
-  };
-
-  const getWeatherIcon = (condition) => {
-    const lowercaseCondition = condition.toLowerCase();
-    if (lowercaseCondition.includes('sunny') || lowercaseCondition.includes('clear')) {
-      return <WiDaySunny />;
-    } else if (lowercaseCondition.includes('cloudy')) {
-      return <WiCloudy />;
-    } else if (lowercaseCondition.includes('rain')) {
-      return <WiRain />;
-    } else if (lowercaseCondition.includes('snow')) {
-      return <WiSnow />;
-    } else if (lowercaseCondition.includes('thunder')) {
-      return <WiThunderstorm />;
-    } else if (lowercaseCondition.includes('fog') || lowercaseCondition.includes('mist')) {
-      return <WiFog />;
-    } else {
-      return <WiDaySunny />;
-    }
-  };
-
-  const getWeatherBackground = (condition) => {
-    const lowercaseCondition = condition.toLowerCase();
-    if (lowercaseCondition.includes('sunny') || lowercaseCondition.includes('clear')) {
-      return 'url("https://images.unsplash.com/photo-1601297183305-6df142704ea2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80")';
-    } else if (lowercaseCondition.includes('cloudy')) {
-      return 'url("https://images.unsplash.com/photo-1534088568595-a066f410bcda?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1051&q=80")';
-    } else if (lowercaseCondition.includes('rain')) {
-      return 'url("https://images.unsplash.com/photo-1519692933481-e162a57d6721?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80")';
-    } else if (lowercaseCondition.includes('snow')) {
-      return 'url("https://images.unsplash.com/photo-1477601263568-180e2c6d046e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80")';
-    } else if (lowercaseCondition.includes('thunder')) {
-      return 'url("https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80")';
-    } else if (lowercaseCondition.includes('fog') || lowercaseCondition.includes('mist')) {
-      return 'url("https://images.unsplash.com/photo-1487621167305-5d248087c724?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1332&q=80")';
-    } else {
-      return 'url("https://images.unsplash.com/photo-1601297183305-6df142704ea2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80")';
-    }
   };
 
   return (
@@ -486,52 +332,6 @@ const App = () => {
           )}
         </SearchInputWrapper>
       </SearchBarContainer>
-      <CenterSearchBarContainer>
-        <SearchInputWrapper ref={weatherInputRef}>
-          <SearchIcon />
-          <SearchInput
-            type="text"
-            placeholder="Search for weather..."
-            value={weatherLocation}
-            onChange={handleWeatherSearch}
-            onKeyDown={(e) => e.key === 'Enter' && fetchWeatherData(weatherLocation)}
-          />
-          {weatherSuggestions.length > 0 && (
-            <SuggestionList>
-              {weatherSuggestions.map((suggestion, index) => (
-                <SuggestionItem key={index} onClick={() => handleWeatherSuggestionClick(suggestion)}>
-                  {suggestion.name}, {suggestion.region}, {suggestion.country}
-                </SuggestionItem>
-              ))}
-            </SuggestionList>
-          )}
-        </SearchInputWrapper>
-      </CenterSearchBarContainer>
-      {weatherData && (
-        <WeatherContainer backgroundImage={getWeatherBackground(weatherData.current.condition.text)}>
-          <WeatherInfo>
-            <WeatherLocation>{weatherData.location.name}, {weatherData.location.country}</WeatherLocation>
-            <WeatherIcon>{getWeatherIcon(weatherData.current.condition.text)}</WeatherIcon>
-            <WeatherCondition>{weatherData.current.condition.text}</WeatherCondition>
-            <WeatherDetail>
-              <WeatherLabel>Temperature:</WeatherLabel>
-              <WeatherValue>{weatherData.current.temp_c}°C / {weatherData.current.temp_f}°F</WeatherValue>
-            </WeatherDetail>
-            <WeatherDetail>
-              <WeatherLabel>Feels like:</WeatherLabel>
-              <WeatherValue>{weatherData.current.feelslike_c}°C / {weatherData.current.feelslike_f}°F</WeatherValue>
-            </WeatherDetail>
-            <WeatherDetail>
-              <WeatherLabel>Humidity:</WeatherLabel>
-              <WeatherValue>{weatherData.current.humidity}%</WeatherValue>
-            </WeatherDetail>
-            <WeatherDetail>
-              <WeatherLabel>Wind:</WeatherLabel>
-              <WeatherValue>{weatherData.current.wind_kph} km/h</WeatherValue>
-            </WeatherDetail>
-          </WeatherInfo>
-        </WeatherContainer>
-      )}
       <ClockContainer>
         <ClockWrapper>
           <ClockSVG viewBox="0 0 300 300">

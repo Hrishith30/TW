@@ -12,14 +12,16 @@ const AppContainer = styled.div`
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #3494e6 0%, #ec6ead 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  overflow: hidden;
 `;
 
 const SearchBarContainer = styled.div`
-  position: fixed;
+  position: absolute;
   top: 20px;
   z-index: 1000;
 `;
@@ -28,13 +30,15 @@ const SearchInputWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 25px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.5);
   }
 `;
 
@@ -46,47 +50,55 @@ const SearchInput = styled.input`
   width: 300px;
   outline: none;
   background-color: transparent;
+  color: #ffffff;
   
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
   &:focus {
-    box-shadow: 0 0 0 2px #3498db;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
   }
 `;
 
 const SearchIcon = styled(FaSearch)`
   position: absolute;
   left: 15px;
-  color: #3498db;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 18px;
 `;
 
 const ClockContainer = styled.div`
-  margin-top: 300px;
-`;
-
-const ClockWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
-const ClockSVG = styled.svg`
+const ClockWrapper = styled.div`
+  position: relative;
   width: 300px;
   height: 300px;
-  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.2));
+`;
+
+const ClockSVG = styled.svg`
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 25px rgba(0, 0, 0, 0.3));
 `;
 
 const ClockFace = styled.circle`
+  fill: #ffffff;
   stroke: #000000;
-  stroke-width: 8;
+  stroke-width: 10;
 `;
 
 const ClockNumber = styled.text`
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
-  fill: #ffffff;
+  fill: #333333;
   text-anchor: middle;
   dominant-baseline: central;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Arial', sans-serif';
 `;
 
 const ClockHand = styled.line`
@@ -95,18 +107,21 @@ const ClockHand = styled.line`
 `;
 
 const HourHand = styled(ClockHand)`
-  stroke: #ffffff;
-  stroke-width: 12;
+  stroke: #2c3e50;
+  stroke-width: 8;
+  stroke-linecap: round;
 `;
 
 const MinuteHand = styled(ClockHand)`
-  stroke: #ffffff;
-  stroke-width: 8;
+  stroke: #34495e;
+  stroke-width: 6;
+  stroke-linecap: round;
 `;
 
 const SecondHand = styled(ClockHand)`
   stroke: #e74c3c;
   stroke-width: 4;
+  stroke-linecap: round;
 `;
 
 const CenterDot = styled.circle`
@@ -115,30 +130,32 @@ const CenterDot = styled.circle`
 
 const DecorativeRing = styled.circle`
   fill: none;
-  stroke: #3498db;
-  stroke-width: 3;
-  opacity: 0.6;
+  stroke: #808080;
+  stroke-width: 5;
+  opacity: 0.8;
 `;
 
 const TickMark = styled.line`
-  stroke: #ffffff;
+  stroke: #333333;
   stroke-width: ${props => props.isMajor ? 3 : 1};
 `;
 
 const DigitalTimeAndDate = styled.div`
-  font-size: 24px;
-  color: #333;
-  margin-top: 20px;
+  font-size: 28px;
+  color: #ffffff;
+  margin-top: 30px;
   text-align: center;
-  font-family: 'Arial', sans-serif;
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 10px 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif';
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 15px 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 `;
 
 const DigitalDate = styled.div`
-  font-size: 18px;
+  font-size: 20px;
   margin-top: 5px;
 `;
 
@@ -147,9 +164,10 @@ const SuggestionList = styled.ul`
   top: 100%;
   left: 0;
   right: 0;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.9);
   border-radius: 0 0 25px 25px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(4px);
   list-style-type: none;
   padding: 0;
   margin: 0;
@@ -160,16 +178,23 @@ const SuggestionList = styled.ul`
 const SuggestionItem = styled.li`
   padding: 10px 20px;
   cursor: pointer;
+  color: #333333;
   &:hover {
-    background-color: #f0f0f0;
+    background-color: rgba(255, 255, 255, 0.5);
   }
 `;
 
 const LocationMessage = styled.div`
-  font-size: 18px;
-  color: #333;
-  margin-top: 10px;
+  font-size: 20px;
+  color: #ffffff;
+  margin-top: 15px;
   text-align: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 10px 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 `;
 
 // Helper Functions
@@ -337,7 +362,7 @@ const App = () => {
           <ClockSVG viewBox="0 0 300 300">
             <defs>
               <linearGradient id="clockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#f5f5f5" />
+                <stop offset="0%" stopColor="#f9f9f9" />
                 <stop offset="100%" stopColor="#e0e0e0" />
               </linearGradient>
             </defs>
@@ -370,32 +395,32 @@ const App = () => {
               y1="150"
               x2="150"
               y2="80"
-              transform={`rotate(${hourRotation})`}
+              transform={`rotate(${hourRotation}, 150, 150)`}
             />
             <MinuteHand
               x1="150"
               y1="150"
               x2="150"
               y2="50"
-              transform={`rotate(${minuteRotation})`}
+              transform={`rotate(${minuteRotation}, 150, 150)`}
             />
             <SecondHand
               x1="150"
               y1="150"
               x2="150"
               y2="30"
-              transform={`rotate(${secondRotation})`}
+              transform={`rotate(${secondRotation}, 150, 150)`}
             />
-            <CenterDot cx="150" cy="150" r="10" />
+            <CenterDot cx="150" cy="150" r="8" />
           </ClockSVG>
-          <DigitalTimeAndDate>
-            <div>{formatDigitalTime(adjustedTime)}</div>
-            <DigitalDate>{formatDigitalDate(adjustedTime)}</DigitalDate>
-          </DigitalTimeAndDate>
-          {selectedLocation && (
-            <LocationMessage>{selectedLocation}</LocationMessage>
-          )}
         </ClockWrapper>
+        <DigitalTimeAndDate>
+          <div>{formatDigitalTime(adjustedTime)}</div>
+          <DigitalDate>{formatDigitalDate(adjustedTime)}</DigitalDate>
+        </DigitalTimeAndDate>
+        {selectedLocation && (
+          <LocationMessage>{selectedLocation}</LocationMessage>
+        )}
       </ClockContainer>
     </AppContainer>
   );
